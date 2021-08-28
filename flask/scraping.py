@@ -53,6 +53,30 @@ def index():
   print(data)
   return jsonify({'data':data})
 
+@app.route('/api/v1/recommend', methods=['GET', 'POST'])
+def recommend():
+  import sys
+  import pymysql.cursors
+  connection = pymysql.connect(host='localhost',
+                               user='root',
+                               password='taberoi',
+                               db='taberoi',
+                               charset='utf8',
+                               cursorclass=pymysql.cursors.DictCursor)
+
+  with connection.cursor() as cursor:
+    sql = "SELECT * FROM json_users ORDER BY RAND() LIMIT 1;"
+    cursor.execute(sql)
+
+    service = 2
+    results = cursor.fetchall()
+    col = ast.literal_eval(results[0]['col'])
+    data = {'name':col['name'], 'price':col['price'], 'store':col['store'], 'deliv':col['deliv'], 'service':service, 'url':col['url']}
+
+  connection.close()
+  print(data)
+  return jsonify({'data':data})
+
 def uberEats(key, u):
   response = requests.get('https://www.ubereats.com/jp/category/tokyo-tokyo/' + key)
   soup = BeautifulSoup(response.text, 'html.parser')
